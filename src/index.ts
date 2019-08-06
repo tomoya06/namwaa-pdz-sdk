@@ -1,5 +1,38 @@
 import * as _ from "lodash";
 
+export enum SUIT {
+  hearts,
+  diamonds,
+  spades,
+  clubs,
+}
+
+export enum HANDTYPE {
+  Fake = -1,
+  Single = 1,
+  Double = 2, // 对子
+  Five = 5, // 无意义，作为分界
+  Flush, // 同花
+  Straight, // 顺子
+  House, // 富庶
+  Four, // 福禄
+  FS, // 同花顺
+}
+
+interface DynamicObject {
+  [key: string]: any;
+}
+
+interface Hand {
+  dominant: string,
+  type: HANDTYPE,
+}
+
+interface PokerCard {
+  suit: SUIT,
+  point: string,
+}
+
 // a = 4, b = 5, ..., k = A, l = 2, m = 3
 const allNumbers: string[] = _.range(13).map((_val) =>
   String.fromCharCode(97 + _val),
@@ -43,55 +76,51 @@ export function shuffleCards(): any[][] {
 };
 
 /**
+ * check if the hand is single
+ * @param cards string[]
+ */
+function digestSingle(cards: string[]): Hand {
+  if (cards.length !== 1) { return FAKE_HAND; }
+  return {
+    dominant: cards[0],
+    type: HANDTYPE.Single,
+  }
+}
+
+/**
  * Check if the hand is a double.
  * @param cards string[]
  * @returns [string, number]
  */
-const digestDouble = (cards: string[]): Hand => {
+function digestDouble(cards: string[]): Hand {
   if (cards.length !== 2) { return FAKE_HAND; }
   if (cards[0][0] !== cards[1][0]) { return FAKE_HAND; }
   return {
-    dominant: _.max(cards) || "",
+    dominant: _.max(cards) || cards[0],
     type: HANDTYPE.Double,
   };
 };
 
 /**
  * Check if the hand is a five-card
- * @param cards string[]
+ * @param fcards string[]
  */
-const digestFives = (cards: string[]): Hand => {
-  if (cards.length !== 5) { return FAKE_HAND; }
-  cards = cards.sort();
+function digestFives(fcards: string[]): Hand {
+  if (fcards.length !== 5) { return FAKE_HAND; }
+  const cards = _.sortBy(fcards);
   // Check if it's straight or flush
-  let sFlag = true;
-  let fFlag = true;
-  // for (let i = 0; i < 4; i++) {
-  //   if (
-  //     cards[i].charCodeAt(0) - cards[i + 1].charCodeAt(0) !== -1
-  //   ) {
-  //     sFlag = false;
-  //   }
-  //   if (
-  //     cards[i].charCodeAt(0) - cards[i + 1].charCodeAt(0) !== -9
-  //   ) {
-  //     sFlag = false;
-  //   }
-  //   if (cards[i][1] !== cards[i + 1][1]) {
-  //     fFlag = false;
-  //   }
-  // }
-  // if (sFlag && fFlag) { return [cards[4], 3]; }
-  // if (sFlag) { return [cards[4], 1]; }
-  // if (fFlag) { return [cards[4], 0]; }
+  let sFlag = false;
+  let fFlag = false;
   // CHECK FLUSH
   const colors = _.map(cards, (_card) => _card[1]);
-  fFlag = _.union(colors).length === 1;
+  fFlag = _.uniq(colors).length === 1;
 
   // CHECK STRAIGHT
-  const doubleCards: any[] = [];
-  doubleCards.concat(cards.map(_card => _card.charCodeAt(0)));
-  doubleCards.concat(cards.map(_card => _card.charCodeAt(0) + 13))
+  let doubleCards: number[] = [];
+  doubleCards = _.concat(doubleCards, cards.map(_card => _card.charCodeAt(0)));
+  // [].push.apply(doubleCards, (cards.map(_card => _card.charCodeAt(0))));
+  doubleCards = _.concat(doubleCards, cards.map(_card => _card.charCodeAt(0) + 13));
+  // doubleCards.concat(cards.map(_card => _card.charCodeAt(0) + 13))
   let uprisingCnt = 0;
   let dominantIdx = 0;
   for (let i = 0; i < 9; i++) {
@@ -101,7 +130,7 @@ const digestFives = (cards: string[]): Hand => {
       uprisingCnt = 0;
     }
     if (uprisingCnt === 4) {
-      dominantIdx = uprisingCnt % 5;
+      dominantIdx = (i + 1) % 5;
       sFlag = true;
       break;
     }
@@ -126,7 +155,7 @@ const digestFives = (cards: string[]): Hand => {
     };
   }
 
-  const divides: DynamicObj = {};
+  const divides: DynamicObject = {};
   cards.forEach((_card) => {
     if (_.includes(Object.keys(divides), _card[0])) {
       divides[_card[0]].push(_card);
@@ -137,10 +166,6 @@ const digestFives = (cards: string[]): Hand => {
   if (Object.keys(divides).length !== 2) { return FAKE_HAND; }
   const groups = _.values(divides) as string[][];
   switch (groups[0].length) {
-    // case 2: return [_.max(groups[1]), 1];
-    // case 3: return [_.max(groups[0]), 1];
-    // case 1: return [_.max(groups[1]), 2];
-    // case 4: return [_.max(groups[0]), 2];
     case 2: case 3:
       return {
         dominant: _.max(groups[3 - groups[0].length]) || "",
@@ -148,51 +173,63 @@ const digestFives = (cards: string[]): Hand => {
       };
     case 1: case 4:
       return {
-        dominant: _.max(groups[(5 - groups[0].length) >> 1]) || "",
+        dominant: _.max(groups[(4 - groups[0].length) >> 1]) || "",
         type: HANDTYPE.Four,
       };
     default: return FAKE_HAND;
   }
 };
 
-const isCardLegal = (cards: string[]): boolean => {
-  if (_.union(cards).length !== cards.length) {
-    return false;
+/**
+ * check if your cards can form a legal hand. including single, double and fives. 
+ * @param cards string[] cards to be check
+ */
+export function digestHand(cards: string[]): Hand {
+  // CHECK if repeats
+  if (_.uniq(cards).length !== cards.length) {
+    return FAKE_HAND;
   }
-  if (!_.includes([1, 2, 5], cards.length)) {
-    return false;
-  }
-  const everyCardRes = !_.every(cards, (_card) => {
+  // CHECK if every card is a CARD.
+  const everyCardRes = _.every(cards, (_card) => {
     return _card.length === 2
       && _card[0] <= "m" && cards[0] >= "a"
       && _card[1] <= "D" && _card[1] >= "A";
   });
-  if (everyCardRes) {
-    return false;
+  if (!everyCardRes) {
+    return FAKE_HAND;
   }
-  return true;
+  // CHECK if this is a literal hand
+  switch (cards.length) {
+    case 1:
+      return digestSingle(cards);
+    case 2:
+      return digestDouble(cards);
+    case 5:
+      return digestFives(cards);
+    default:
+      return FAKE_HAND;
+  }
 };
 
-export const isHandLegal = (cards: string[], lastHand: string[]): boolean => {
-  if (!isCardLegal(cards)) {
-    return false;
-  }
-  if (lastHand.length !== 0 && lastHand.length !== cards.length) {
+/**
+ * compare if current hand is larger than the last one. if lasthand is empty array, it means current hand is playing at the first place. 
+ * @param hands string[] current hands
+ * @param lastHand string[] last hands
+ */
+export function compareHands(hands: string[], lastHand: string[]): boolean {
+  if (lastHand.length !== 0 && lastHand.length !== hands.length) {
     return false;
   }
   if (lastHand.length === 0) {
-    return _.includes(cards, MIN_4) && (
-      cards.length === 1
-      || digestDouble(cards).type === HANDTYPE.Single
-      || digestFives(cards).type > HANDTYPE.Five
-    );
+    return _.includes(hands, MIN_4) &&
+      digestHand(hands).type !== HANDTYPE.Fake;
   } else {
-    switch (cards.length) {
-      case 1: return cards[0] > lastHand[0];
-      case 2: return digestDouble(cards).dominant > digestDouble(lastHand).dominant;
+    const dc = digestHand(hands);
+    const dh = digestHand(lastHand);
+    switch (hands.length) {
+      case 1: return hands[0] > lastHand[0];
+      case 2: return dc.dominant > dh.dominant;
       case 5:
-        const dc = digestFives(cards);
-        const dh = digestFives(lastHand);
         return (
           // Larger type
           dc.type > dh.type

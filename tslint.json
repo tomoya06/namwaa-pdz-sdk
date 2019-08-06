@@ -4,6 +4,9 @@
         "tslint-config-prettier"
     ],
     "rules": {
-        "no-console": false
+        "no-console": false,
+        "no-bitwise": false,
+        "variable-name": false,
+        "interface-name": false
     }
 }
