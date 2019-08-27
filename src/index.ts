@@ -1,11 +1,11 @@
 import * as _ from "lodash";
 
-export enum SUIT {
-  hearts,
-  diamonds,
-  spades,
-  clubs,
-}
+// export enum SUIT {
+//   hearts,
+//   diamonds,
+//   spades,
+//   clubs,
+// }
 
 export enum HANDTYPE {
   Fake = -1,
@@ -23,13 +23,18 @@ interface DynamicObject {
   [key: string]: any;
 }
 
-interface Hand {
+export interface ShuffleResult {
+  hands: string[][],
+  starter: number,
+}
+
+export interface Hand {
   dominant: string,
   type: HANDTYPE,
 }
 
-interface PokerCard {
-  suit: SUIT,
+export interface PokerCard {
+  suit: string,
   point: string,
 }
 
@@ -41,6 +46,10 @@ const allNumbers: string[] = _.range(13).map((_val) =>
 const allColors: string[] = _.range(4).map((_val) =>
   String.fromCharCode(65 + _val),
 );
+
+// For Poker.js
+const allPoints = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+const allSuits = ['diamonds', 'clubs', 'hearts', 'spades'];
 
 // aA = ♦4, ...
 const allCards = _.flatten(
@@ -63,16 +72,18 @@ const FAKE_HAND: Hand = {
 /**
  * Shuffle cards for a new game.
  */
-export function shuffleCards(): any[][] {
+export function shuffleCards(): ShuffleResult {
   const sCards = _.shuffle(allCards);
-  const starter = _.findIndex(sCards, MIN_4) / 13;
-  return [
-    sCards.slice(0, 13),
-    sCards.slice(13, 26),
-    sCards.slice(26, 39),
-    sCards.slice(39, 52),
-    [starter],
-  ];
+  const starter = Math.floor(sCards.indexOf(MIN_4) / 13);
+  return {
+    hands: [
+      sCards.slice(0, 13).sort(),
+      sCards.slice(13, 26).sort(),
+      sCards.slice(26, 39).sort(),
+      sCards.slice(39, 52).sort(),
+    ],
+    starter,
+  };
 };
 
 /**
@@ -118,9 +129,7 @@ function digestFives(fcards: string[]): Hand {
   // CHECK STRAIGHT
   let doubleCards: number[] = [];
   doubleCards = _.concat(doubleCards, cards.map(_card => _card.charCodeAt(0)));
-  // [].push.apply(doubleCards, (cards.map(_card => _card.charCodeAt(0))));
   doubleCards = _.concat(doubleCards, cards.map(_card => _card.charCodeAt(0) + 13));
-  // doubleCards.concat(cards.map(_card => _card.charCodeAt(0) + 13))
   let uprisingCnt = 0;
   let dominantIdx = 0;
   for (let i = 0; i < 9; i++) {
@@ -243,3 +252,20 @@ export function compareHands(hands: string[], lastHand: string[]): boolean {
   }
   return false;
 };
+
+export function cardDecoder(card: string): PokerCard {
+  const pointIdx = allNumbers.indexOf(card.charAt(0));
+  const suitIdx = allColors.indexOf(card.charAt(1));
+
+  return {
+    point: allPoints[pointIdx],
+    suit: allSuits[suitIdx],
+  }
+};
+
+export function cardEncoder(poker: PokerCard): string {
+  const numberIdx = allPoints.indexOf(poker.point);
+  const colorIdx = allSuits.indexOf(poker.suit);
+
+  return `${allNumbers[numberIdx]}${allColors[colorIdx]}`;
+}
