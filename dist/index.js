@@ -43,9 +43,9 @@ var allCards = _.flatten(allNumbers.map(function (_num) {
         return "" + _num + _color;
     });
 }));
-exports.MIN_4 = "aA";
-exports.BIG_A = "kD";
-exports.BIG_3 = "mD";
+exports.MIN_4 = 'aA';
+exports.BIG_A = 'kD';
+exports.BIG_3 = 'mD';
 var FAKE_HAND = {
     dominant: '',
     type: HANDTYPE.Fake,
@@ -67,7 +67,6 @@ function shuffleCards() {
     };
 }
 exports.shuffleCards = shuffleCards;
-;
 /**
  * check if the hand is single
  * @param cards string[]
@@ -98,7 +97,6 @@ function digestDouble(cards) {
         type: HANDTYPE.Double,
     };
 }
-;
 /**
  * Check if the hand is a five-card
  * @param fcards string[]
@@ -168,19 +166,18 @@ function digestFives(fcards) {
         case 2:
         case 3:
             return {
-                dominant: _.max(groups[3 - groups[0].length]) || "",
+                dominant: _.max(groups[3 - groups[0].length]) || '',
                 type: HANDTYPE.House,
             };
         case 1:
         case 4:
             return {
-                dominant: _.max(groups[(4 - groups[0].length) >> 1]) || "",
+                dominant: _.max(groups[(4 - groups[0].length) >> 1]) || '',
                 type: HANDTYPE.Four,
             };
         default: return FAKE_HAND;
     }
 }
-;
 /**
  * check if your cards can form a legal hand. including single, double and fives.
  * @param cards string[] cards to be check
@@ -193,8 +190,8 @@ function digestHand(cards) {
     // CHECK if every card is a CARD.
     var everyCardRes = _.every(cards, function (_card) {
         return _card.length === 2
-            && _card[0] <= "m" && cards[0] >= "a"
-            && _card[1] <= "D" && _card[1] >= "A";
+            && _card[0] <= 'm' && cards[0] >= 'a'
+            && _card[1] <= 'D' && _card[1] >= 'A';
     });
     if (!everyCardRes) {
         return FAKE_HAND;
@@ -212,7 +209,6 @@ function digestHand(cards) {
     }
 }
 exports.digestHand = digestHand;
-;
 /**
  * compare if current hand is larger than the last one. if lasthand is empty array, it means current hand is playing at the first place.
  * @param hands string[] current hands
@@ -226,7 +222,7 @@ function compareHands(hands, lastHand) {
         return _.includes(hands, exports.MIN_4) &&
             digestHand(hands).type !== HANDTYPE.Fake;
     }
-    else {
+    {
         var dc = digestHand(hands);
         var dh = digestHand(lastHand);
         switch (hands.length) {
@@ -246,7 +242,6 @@ function compareHands(hands, lastHand) {
     return false;
 }
 exports.compareHands = compareHands;
-;
 function cardDecoder(card) {
     var pointIdx = allNumbers.indexOf(card.charAt(0));
     var suitIdx = allColors.indexOf(card.charAt(1));
@@ -256,7 +251,6 @@ function cardDecoder(card) {
     };
 }
 exports.cardDecoder = cardDecoder;
-;
 function cardEncoder(poker) {
     var numberIdx = allPoints.indexOf(poker.point);
     var colorIdx = allSuits.indexOf(poker.suit);

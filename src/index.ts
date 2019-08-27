@@ -1,4 +1,4 @@
-import * as _ from "lodash";
+import * as _ from 'lodash';
 
 // export enum SUIT {
 //   hearts,
@@ -24,18 +24,18 @@ interface DynamicObject {
 }
 
 export interface ShuffleResult {
-  hands: string[][],
-  starter: number,
+  hands: string[][];
+  starter: number;
 }
 
 export interface Hand {
-  dominant: string,
-  type: HANDTYPE,
+  dominant: string;
+  type: HANDTYPE;
 }
 
 export interface PokerCard {
-  suit: string,
-  point: string,
+  suit: string;
+  point: string;
 }
 
 // a = 4, b = 5, ..., k = A, l = 2, m = 3
@@ -60,14 +60,14 @@ const allCards = _.flatten(
   ),
 );
 
-export const MIN_4 = "aA";
-export const BIG_A = "kD";
-export const BIG_3 = "mD";
+export const MIN_4 = 'aA';
+export const BIG_A = 'kD';
+export const BIG_3 = 'mD';
 
 const FAKE_HAND: Hand = {
   dominant: '',
   type: HANDTYPE.Fake,
-}
+};
 
 /**
  * Shuffle cards for a new game.
@@ -84,7 +84,7 @@ export function shuffleCards(): ShuffleResult {
     ],
     starter,
   };
-};
+}
 
 /**
  * check if the hand is single
@@ -95,7 +95,7 @@ function digestSingle(cards: string[]): Hand {
   return {
     dominant: cards[0],
     type: HANDTYPE.Single,
-  }
+  };
 }
 
 /**
@@ -110,7 +110,7 @@ function digestDouble(cards: string[]): Hand {
     dominant: _.max(cards) || cards[0],
     type: HANDTYPE.Double,
   };
-};
+}
 
 /**
  * Check if the hand is a five-card
@@ -177,20 +177,20 @@ function digestFives(fcards: string[]): Hand {
   switch (groups[0].length) {
     case 2: case 3:
       return {
-        dominant: _.max(groups[3 - groups[0].length]) || "",
+        dominant: _.max(groups[3 - groups[0].length]) || '',
         type: HANDTYPE.House,
       };
     case 1: case 4:
       return {
-        dominant: _.max(groups[(4 - groups[0].length) >> 1]) || "",
+        dominant: _.max(groups[(4 - groups[0].length) >> 1]) || '',
         type: HANDTYPE.Four,
       };
     default: return FAKE_HAND;
   }
-};
+}
 
 /**
- * check if your cards can form a legal hand. including single, double and fives. 
+ * check if your cards can form a legal hand. including single, double and fives.
  * @param cards string[] cards to be check
  */
 export function digestHand(cards: string[]): Hand {
@@ -201,8 +201,8 @@ export function digestHand(cards: string[]): Hand {
   // CHECK if every card is a CARD.
   const everyCardRes = _.every(cards, (_card) => {
     return _card.length === 2
-      && _card[0] <= "m" && cards[0] >= "a"
-      && _card[1] <= "D" && _card[1] >= "A";
+      && _card[0] <= 'm' && cards[0] >= 'a'
+      && _card[1] <= 'D' && _card[1] >= 'A';
   });
   if (!everyCardRes) {
     return FAKE_HAND;
@@ -218,10 +218,10 @@ export function digestHand(cards: string[]): Hand {
     default:
       return FAKE_HAND;
   }
-};
+}
 
 /**
- * compare if current hand is larger than the last one. if lasthand is empty array, it means current hand is playing at the first place. 
+ * compare if current hand is larger than the last one. if lasthand is empty array, it means current hand is playing at the first place.
  * @param hands string[] current hands
  * @param lastHand string[] last hands
  */
@@ -232,7 +232,7 @@ export function compareHands(hands: string[], lastHand: string[]): boolean {
   if (lastHand.length === 0) {
     return _.includes(hands, MIN_4) &&
       digestHand(hands).type !== HANDTYPE.Fake;
-  } else {
+  }  {
     const dc = digestHand(hands);
     const dh = digestHand(lastHand);
     switch (hands.length) {
@@ -251,7 +251,7 @@ export function compareHands(hands: string[], lastHand: string[]): boolean {
     }
   }
   return false;
-};
+}
 
 export function cardDecoder(card: string): PokerCard {
   const pointIdx = allNumbers.indexOf(card.charAt(0));
@@ -260,8 +260,8 @@ export function cardDecoder(card: string): PokerCard {
   return {
     point: allPoints[pointIdx],
     suit: allSuits[suitIdx],
-  }
-};
+  };
+}
 
 export function cardEncoder(poker: PokerCard): string {
   const numberIdx = allPoints.indexOf(poker.point);

@@ -2,14 +2,15 @@
   "name": "namwaa-pdz-sdk",
   "version": "1.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "mocha -r ts-node/register src/test/*.test.ts",
     "clean": "rm -rf dist",
-    "build": "npm run clean && tsc && npm run minify",
+    "build": "npm run clean && tsc -p tsconfig.json && npm run minify",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "minify": "uglifyjs --compress --mangle --output dist/index.min.js -- dist/index.js",
-    "lint": "tslint -p tsconfig.json",
+    "lint": "tslint -p tslint.json",
     "prepare": "npm run build",
     "postversion": "git push"
   },
@@ -29,6 +30,7 @@
     "prettier": "^1.18.2",
     "ts-node": "^8.3.0",
     "tslint": "^5.18.0",
+    "tslint-config-airbnb": "^5.11.1",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.5.3",
     "uglify-js": "^3.6.0"
