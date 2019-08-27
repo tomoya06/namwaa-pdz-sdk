@@ -48,7 +48,7 @@ const allColors: string[] = _.range(4).map((_val) =>
 );
 
 // For Poker.js
-const allPoints = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+const allPoints = ['4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A', '2', '3'];
 const allSuits = ['diamonds', 'clubs', 'hearts', 'spades'];
 
 // aA = ♦4, ...
@@ -232,7 +232,7 @@ export function compareHands(hands: string[], lastHand: string[]): boolean {
   if (lastHand.length === 0) {
     return _.includes(hands, MIN_4) &&
       digestHand(hands).type !== HANDTYPE.Fake;
-  }  {
+  } {
     const dc = digestHand(hands);
     const dh = digestHand(lastHand);
     switch (hands.length) {

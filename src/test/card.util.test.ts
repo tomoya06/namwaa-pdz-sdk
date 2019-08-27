@@ -4,7 +4,7 @@ import "mocha";
 import { cardDecoder, cardEncoder, MIN_4, PokerCard, shuffleCards } from '../index';
 
 const poker: PokerCard = {
-  point: 'K',
+  point: '3',
   suit: 'spades',
 };
 
