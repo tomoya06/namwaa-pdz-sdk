@@ -5,8 +5,10 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "mocha -r ts-node/register src/test/*.test.ts",
-    "build": "tsc",
+    "clean": "rm -rf dist",
+    "build": "npm run clean && tsc && npm run minify",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "minify": "uglifyjs --compress --mangle --output dist/index.min.js -- dist/index.js",
     "lint": "tslint -p tsconfig.json",
     "prepare": "npm run build",
     "postversion": "git push"
@@ -28,7 +30,8 @@
     "ts-node": "^8.3.0",
     "tslint": "^5.18.0",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.5.3"
+    "typescript": "^3.5.3",
+    "uglify-js": "^3.6.0"
   },
   "dependencies": {
     "@types/lodash": "^4.14.136",
