@@ -34,7 +34,7 @@ export interface Hand {
 }
 
 export interface PokerCard {
-  suit: string;
+  suit: '♠'|'♥'|'♣'|'♦'|string;
   point: string;
 }
 
@@ -49,7 +49,7 @@ const allColors: string[] = _.range(4).map((_val) =>
 
 // For Poker.js
 const allPoints = ['4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A', '2', '3'];
-const allSuits = ['diamonds', 'clubs', 'hearts', 'spades'];
+const allSuits = [ '♦', '♣', '♥','♠'];
 
 // aA = ♦4, ...
 const allCards = _.flatten(

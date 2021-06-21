@@ -5,7 +5,7 @@ import { cardDecoder, cardEncoder, MIN_4, PokerCard, shuffleCards } from '../ind
 
 const poker: PokerCard = {
   point: '3',
-  suit: 'spades',
+  suit: '♠',
 };
 
 describe("+ Check Utils", () => {
