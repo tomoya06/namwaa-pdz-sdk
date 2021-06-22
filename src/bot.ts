@@ -1,35 +1,109 @@
 import _ from 'lodash';
-import { MIN_4 } from './utils/const';
+import { legalStraights, MIN_4 } from './utils/const';
+import combinations from 'combinations';
+import { HANDTYPE } from './utils/types';
 
 export type CardStack = Array<[string, string[][]]>;
+export type HandPool = Map<HANDTYPE, string[][]>;
 
 export interface BotConfig {
   fromSmallRate: number;
 }
 
-function extractAllPlayableHands(myCards: string[]): string[][] {
-  const res: string[][] = [];
-  myCards.sort();
-
+function cardMapper(myCards: string[]) {
+  const pointCardMap: { [pt: string]: string[] } = {};
+  
   // 单张牌 无脑出
   myCards.forEach(card => {
-    res.push([card]);
+    const curPoint = card[0];
+    pointCardMap[curPoint] = pointCardMap[curPoint]
+    ? [...pointCardMap[curPoint], card]
+    : [card];
   });
 
-  const pointCntMap: { [pt: string]: number } = {};
-  const pointCardMap: { [pt: string]: string[] } = {};
+  return pointCardMap;
+}
 
-  // 找对子
-  for (let i = 0; i < myCards.length; i += 1) {
-    const curCard = myCards[i];
-    const curPoint = curCard[0];
-    pointCntMap[curPoint] = pointCntMap[curPoint] ? pointCntMap[curPoint] + 1 : 1;
-    pointCardMap[curPoint] = pointCardMap[curPoint]
-      ? [...pointCardMap[curPoint], curCard]
-      : [curCard];
-    if (curCard && myCards[i + 1] && curPoint === myCards[i + 1][0]) {
-      res.push([curCard, myCards[i + 1]]);
+function suitMapper(myCards: string[]) {
+  const suitCardMap: {[suit: string]: string[]} = {};
+
+  for (let suit of 'ABCD') {
+    suitCardMap[suit] = myCards.filter(card => card[1] === suit);
+  }
+
+  return suitCardMap;
+}
+
+function extractAllPlayableHands(myCards: string[]): HandPool {
+  const res: HandPool = new Map();
+  myCards.sort();
+
+  const cardMap = cardMapper(myCards);
+  const suitMap = suitMapper(myCards);
+
+  const h1s = myCards.map(card => [card]);
+  const h2s = Object.values(cardMap).filter((val) => val.length >= 2);
+  const h3s = Object.values(cardMap).filter((val) => val.length >= 3);
+  const h4s = Object.values(cardMap).filter((val) => val.length >= 4);
+  
+  res.set(HANDTYPE.Single, h1s);
+
+  if (h2s.length) {
+    h2s.forEach(cards => {
+      const curRes = combinations(cards, 2, 2);
+      res.set(HANDTYPE.Double, curRes);
+    })
+  }
+
+  // 同花+同花顺
+  Object.values(suitMap).forEach(cards => {
+    if (cards.length >= 5) {
+      const res = combinations(cards);
     }
+  })
+
+  // 顺子(不保证能同花顺)
+  legalStraights.forEach(ls => {
+    const curRes: string[][] = [];
+    const fcurRes: string[][] = [];
+    const lsEnough = ls.every(lsKey => cardMap[lsKey]);
+    if (lsEnough) {
+      const cards = ls.map(lsKey => cardMap[lsKey][0]);
+      if (cards.every(card => card[1] === cards[0][1])) {
+        fcurRes.push(cards);
+      } else {
+        curRes.push(cards);
+      }
+    }
+    res.set(HANDTYPE.Straight, curRes);
+    res.set(HANDTYPE.FS, fcurRes);
+  })
+
+  // 富庶
+  if (h3s.length && h2s.length) {
+    const curRes: string[][] = [];
+    h3s.forEach(cards => {
+      const res3 = cards.slice(0,3);
+
+      h2s.forEach(cards2 => {
+        if (cards2[0][0] === cards[0][0]) return;
+        const res2 = cards2.slice(0,2);
+        curRes.push([...res2, ...res3].sort());
+      })
+    })
+    res.set(HANDTYPE.House, curRes);
+  }
+
+  // 福禄
+  if (h4s.length) {
+    const curRes: string[][] = [];
+    h4s.forEach(cards => {
+      h1s.forEach(cards1 => {
+        if (cards1[0][0] === cards[0][0]) return;
+        curRes.push([cards1[0], ...cards]);
+      })
+    })
+    res.set(HANDTYPE.Four, curRes);
   }
 
   return res;

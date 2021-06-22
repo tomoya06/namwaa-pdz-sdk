@@ -21,3 +21,5 @@ export const allSuits = ['♦', '♣', '♥', '♠'];
 
 // aA = ♦4, ...
 export const allCards = _.flatten(allNumbers.map(_num => allColors.map(_color => `${_num}${_color}`)));
+
+export const legalStraights = ["abcde", "bcdef", "cdefg", "defgh", "efghi", "fghij", "ghijk", "hijkl", "ijklm", "jklma", "klmab", "lmabc", "mabcd"].map(s => s.split(''));
