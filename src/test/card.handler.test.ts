@@ -1,7 +1,9 @@
 import { expect } from "chai";
 import "mocha";
+import { MIN_4, BIG_3 } from "../const";
 
-import { BIG_3, compareHands, digestHand, HANDTYPE, MIN_4 } from "../index";
+import { compareHands, digestHand, } from "../index";
+import { HANDTYPE } from "../types";
 
 describe("+ Check Hands", () => {
   describe("- Single", () => {
