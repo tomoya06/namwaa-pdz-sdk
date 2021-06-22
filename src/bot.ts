@@ -17,12 +17,18 @@ function extractAllPlayableHands(myCards: string[]): string[][] {
   });
 
   const pointCntMap: { [pt: string]: number } = {};
+  const pointCardMap: { [pt: string]: string[] } = {};
 
   // 找对子
   for (let i = 0; i < myCards.length; i += 1) {
-    pointCntMap[myCards[i][0]] = pointCntMap[myCards[i][0]] ? pointCntMap[myCards[i][0]] + 1 : 1;
-    if (myCards[i] && myCards[i + 1] && myCards[i][0] === myCards[i + 1][0]) {
-      res.push([myCards[i], myCards[i + 1]]);
+    const curCard = myCards[i];
+    const curPoint = curCard[0];
+    pointCntMap[curPoint] = pointCntMap[curPoint] ? pointCntMap[curPoint] + 1 : 1;
+    pointCardMap[curPoint] = pointCardMap[curPoint]
+      ? [...pointCardMap[curPoint], curCard]
+      : [curCard];
+    if (curCard && myCards[i + 1] && curPoint === myCards[i + 1][0]) {
+      res.push([curCard, myCards[i + 1]]);
     }
   }
 
