@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import { MIN_4, FAKE_HAND, allCards, allColors, allNumbers, allPoints, allSuits } from './const';
-import { ShuffleResult, Hand, HANDTYPE, PokerCard } from './types';
+import { MIN_4, FAKE_HAND, allCards, allColors, allNumbers, allPoints, allSuits } from './utils/const';
+import { ShuffleResult, Hand, HANDTYPE, PokerCard } from './utils/types';
 import { digestSingle, digestDouble, digestFives } from './utils/digest';
 
 /**

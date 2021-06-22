@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import { FAKE_HAND } from '../const';
-import { DynamicObject, Hand, HANDTYPE } from '../types';
+import { FAKE_HAND } from './const';
+import { DynamicObject, Hand, HANDTYPE } from './types';
 
 /**
  * check if the hand is single

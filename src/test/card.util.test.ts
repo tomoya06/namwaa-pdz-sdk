@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 import 'mocha';
-import { MIN_4 } from '../const';
+import { MIN_4 } from '../utils/const';
 
 import { cardDecoder, cardEncoder, shuffleCards } from '../index';
-import { PokerCard } from '../types';
+import { PokerCard } from '../utils/types';
 
 const poker: PokerCard = {
   point: '3',
