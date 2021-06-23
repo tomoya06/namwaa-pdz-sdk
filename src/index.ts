@@ -1,7 +1,7 @@
 import _ from 'lodash';
-import { MIN_4, FAKE_HAND, allCards, allColors, allNumbers, allPoints, allSuits } from './utils/const';
-import { ShuffleResult, Hand, HANDTYPE, PokerCard } from './utils/types';
-import { digestSingle, digestDouble, digestFives } from './utils/digest';
+import { allCards, allColors, allNumbers, allPoints, allSuits, FAKE_HAND, MIN_4 } from './utils/const';
+import { digestDouble, digestFives, digestSingle } from './utils/digest';
+import { Hand, HANDTYPE, PokerCard, ShuffleResult } from './utils/types';
 
 /**
  * Shuffle cards for a new game.
@@ -91,6 +91,15 @@ export function cardDecoder(card: string): PokerCard {
     point: allPoints[pointIdx],
     suit: allSuits[suitIdx],
   };
+}
+
+export function cardDecoderForDisplay(card: string): string {
+  const cd = cardDecoder(card);
+  return `${cd.suit}${cd.point}`;
+}
+
+export function displayHands(hands: string[]): string {
+  return hands.map(card => cardDecoderForDisplay(card)).join(' ');
 }
 
 export function cardEncoder(poker: PokerCard): string {

@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import "mocha";
-import { MIN_4, BIG_3 } from "../utils/const";
+import { BIG_3, MIN_4 } from "../utils/const";
 
 import { compareHands, digestHand, } from "../index";
 import { HANDTYPE } from "../utils/types";
@@ -35,43 +35,43 @@ describe("+ Check Hands", () => {
     })
 
     describe("- Straight", () => {
-      it("Straight", () => {
+      it("Straight1", () => {
         expect(digestHand(["aB", "bC", "cA", "dA", "eA"]).type).to.eq(HANDTYPE.Straight);
       })
-      it("Straight", () => {
+      it("Straight2", () => {
         expect(digestHand(["aB", "bC", "cA", "lA", "mA"]).type).to.eq(HANDTYPE.Straight);
         expect(digestHand(["aB", "bC", "cA", "lA", "mA"]).dominant).to.eq('cA');
       })
-      it("Straight", () => {
+      it("Straight3", () => {
         expect(digestHand(["aA", "bA", "cA", "dA", "eD"]).type).to.eq(HANDTYPE.Straight);
         expect(digestHand(["aA", "bA", "cA", "dA", "eD"]).dominant).to.eq('eD');
       })
-      it("Straight", () => {
+      it("Straight4", () => {
         expect(digestHand(["aD", "bD", "cD", "dD", "eA"]).type).to.eq(HANDTYPE.Straight);
         expect(digestHand(["aD", "bD", "cD", "dD", "eA"]).dominant).to.eq('eA');
       })
-      it("NOT Straight", () => {
+      it("NOT Straight1", () => {
         expect(digestHand(["aC", "cA", "cB", "dA", "eA"]).type).to.eq(HANDTYPE.Fake);
       })
-      it("NOT Straight", () => {
+      it("NOT Straight2", () => {
         expect(digestHand(["aB", "bC", "cA", "lA", "kA"]).type).to.eq(HANDTYPE.Fake);
       })
     })
 
     describe("- House", () => {
-      it("House", () => {
+      it("House1", () => {
         expect(digestHand(["aB", "aC", "aA", "dA", "dB"]).type).to.eq(HANDTYPE.House);
         expect(digestHand(["aB", "aC", "aA", "dA", "dB"]).dominant).to.eq('aC');
       })
-      it("Not House", () => {
-        expect(digestHand(["aB", "aC", "aA", "dA", "eB"]).type).to.eq(HANDTYPE.Fake);
-      })
-      it("Not House", () => {
-        expect(digestHand(["aB", "aC", "dA", "dB", "eB"]).type).to.eq(HANDTYPE.Fake);
-      })
-      it("House", () => {
+      it("House2", () => {
         expect(digestHand(["aB", "aC", "dC", "dA", "dB"]).type).to.eq(HANDTYPE.House);
         expect(digestHand(["aB", "aC", "dC", "dA", "dB"]).dominant).to.eq('dC');
+      })
+      it("Not House1", () => {
+        expect(digestHand(["aB", "aC", "aA", "dA", "eB"]).type).to.eq(HANDTYPE.Fake);
+      })
+      it("Not House2", () => {
+        expect(digestHand(["aB", "aC", "dA", "dB", "eB"]).type).to.eq(HANDTYPE.Fake);
       })
     })
 

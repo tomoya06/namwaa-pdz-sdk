@@ -19,6 +19,13 @@ export const allColors: string[] = _.range(4).map(_val => String.fromCharCode(65
 export const allPoints = ['4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A', '2', '3'];
 export const allSuits = ['♦', '♣', '♥', '♠'];
 
+export const suitColorMapper: {[key: string]: string} = {
+  '♦': 'A',
+  '♣': 'B',
+  '♥': 'C',
+  '♠': 'D',
+};
+
 // aA = ♦4, ...
 export const allCards = _.flatten(allNumbers.map(_num => allColors.map(_color => `${_num}${_color}`)));
 

@@ -6,6 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "mocha -r ts-node/register src/test/*.test.ts",
+    "testone": "mocha -r ts-node/register src/test/bot.test.ts",
     "clean": "rm -rf dist",
     "build": "npm run clean && tsc -p tsconfig.json && npm run minify",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
@@ -27,6 +28,7 @@
     "@types/combinations": "^1.0.0",
     "@types/mocha": "^5.2.7",
     "chai": "^4.2.0",
+    "chai-things": "^0.2.0",
     "mocha": "^6.2.0",
     "prettier": "^1.18.2",
     "ts-node": "^8.3.0",
