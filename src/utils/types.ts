@@ -28,3 +28,9 @@ export interface PokerCard {
   suit: '♠' | '♥' | '♣' | '♦' | string;
   point: string;
 }
+
+export type CardStackRecord = [string, string[]];
+export type CardStack = CardStackRecord[];
+export type HandPool = Map<HANDTYPE, string[][]>;
+export type PlayerIdList = [string, string, string, string];
+export type PlayerCardsList = Record<string, string[]>;

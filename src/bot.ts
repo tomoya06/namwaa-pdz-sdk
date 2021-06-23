@@ -2,11 +2,8 @@ import combinations from 'combinations';
 import _ from 'lodash';
 import { compareHands } from '.';
 import { legalStraights, MIN_4 } from './utils/const';
-import { HANDTYPE } from './utils/types';
-
-export type CardStackRecord = [string, string[]];
-export type CardStack = CardStackRecord[];
-export type HandPool = Map<HANDTYPE, string[][]>;
+import { CardStack, CardStackRecord, HandPool, HANDTYPE } from './utils/types';
+import { canIplayAnything, canIplayFirst } from './utils/util';
 
 export interface BotConfig {
   fromSmallRate: number;
@@ -14,20 +11,18 @@ export interface BotConfig {
 
 function cardMapper(myCards: string[]) {
   const pointCardMap: { [pt: string]: string[] } = {};
-  
+
   // 单张牌 无脑出
   myCards.forEach(card => {
     const curPoint = card[0];
-    pointCardMap[curPoint] = pointCardMap[curPoint]
-    ? [...pointCardMap[curPoint], card]
-    : [card];
+    pointCardMap[curPoint] = pointCardMap[curPoint] ? [...pointCardMap[curPoint], card] : [card];
   });
 
   return pointCardMap;
 }
 
 function suitMapper(myCards: string[]) {
-  const suitCardMap: {[suit: string]: string[]} = {};
+  const suitCardMap: { [suit: string]: string[] } = {};
 
   for (const suit of 'ABCD') {
     suitCardMap[suit] = myCards.filter(card => card[1] === suit);
@@ -53,18 +48,18 @@ export function extractAllPlayableHands(myCards: string[]): HandPool {
   const suitMap = suitMapper(myCards);
 
   const h1s = myCards.map(card => [card]);
-  const h2s = Object.values(cardMap).filter((val) => val.length >= 2);
-  const h3s = Object.values(cardMap).filter((val) => val.length >= 3);
-  const h4s = Object.values(cardMap).filter((val) => val.length >= 4);
-  
+  const h2s = Object.values(cardMap).filter(val => val.length >= 2);
+  const h3s = Object.values(cardMap).filter(val => val.length >= 3);
+  const h4s = Object.values(cardMap).filter(val => val.length >= 4);
+
   res.set(HANDTYPE.Single, h1s);
 
   if (h2s.length) {
-    const dbRes: string[][] = []
+    const dbRes: string[][] = [];
     h2s.forEach(cards => {
       const curRes = combinations(cards, 2, 2);
       dbRes.push(...curRes);
-    })
+    });
     res.set(HANDTYPE.Double, dbRes);
   }
 
@@ -80,9 +75,9 @@ export function extractAllPlayableHands(myCards: string[]): HandPool {
         } else {
           flushRes.push(hands);
         }
-      })
+      });
     }
-  })
+  });
   res.set(HANDTYPE.Flush, flushRes);
   res.set(HANDTYPE.FS, fsRes);
 
@@ -97,7 +92,7 @@ export function extractAllPlayableHands(myCards: string[]): HandPool {
         straightRes.push(cards);
       }
     }
-  })
+  });
   res.set(HANDTYPE.Straight, straightRes);
 
   // 富庶
@@ -105,14 +100,16 @@ export function extractAllPlayableHands(myCards: string[]): HandPool {
   const houseRes: string[][] = [];
   if (h3s.length && h2s.length) {
     h3s.forEach(cards => {
-      const res3 = cards.slice(0,3);
+      const res3 = cards.slice(0, 3);
 
       h2s.forEach(cards2 => {
-        if (cards2[0][0] === cards[0][0]) { return; }
-        const res2 = cards2.slice(0,2);
+        if (cards2[0][0] === cards[0][0]) {
+          return;
+        }
+        const res2 = cards2.slice(0, 2);
         houseRes.push([...res2, ...res3].sort());
-      })
-    })
+      });
+    });
   }
   res.set(HANDTYPE.House, houseRes);
 
@@ -122,10 +119,12 @@ export function extractAllPlayableHands(myCards: string[]): HandPool {
   if (h4s.length) {
     h4s.forEach(cards => {
       h1s.forEach(cards1 => {
-        if (cards1[0][0] === cards[0][0]) { return; }
+        if (cards1[0][0] === cards[0][0]) {
+          return;
+        }
         fourRes.push([cards1[0], ...cards]);
-      })
-    })
+      });
+    });
   }
   res.set(HANDTYPE.Four, fourRes);
 
@@ -133,36 +132,13 @@ export function extractAllPlayableHands(myCards: string[]): HandPool {
 }
 
 // 情况1
-function canIplayFirst(stacks: CardStack, myCards: string[]): boolean {
-  if (stacks.length !== 0) { return false; }
-  return _.includes(myCards, MIN_4);
-}
-
 function playFirst(myCards: string[], botConfig: BotConfig): string[] {
-  const allHands = flattenHandPool(extractAllPlayableHands(myCards))
-    .filter(hand => hand.includes(MIN_4));
+  const allHands = flattenHandPool(extractAllPlayableHands(myCards)).filter(hand => hand.includes(MIN_4));
 
   return _.sample(allHands) as string[];
 }
 
 // 情况2
-function canIplayAnything(stacks: CardStack, myId: string): [boolean, number] {
-  // 堆栈里肯定要有至少4条记录
-  const len = stacks.length;
-  if (len < 4) { return [false, len - 1]; }
-
-  function isHePass(idx: number) {
-    return stacks[idx] && stacks[idx][0] !== myId && stacks[idx][1].length === 0;
-  }
-
-  for (let i = len - 1; i >= len - 3; i -= 1) {
-    if (!isHePass(i)) {
-      return [false, i];
-    }
-  }
-
-  return [true, -1];
-}
 
 function playAnything(myCards: string[], botConfig: BotConfig): string[] {
   const allHands = flattenHandPool(extractAllPlayableHands(myCards));
@@ -171,8 +147,7 @@ function playAnything(myCards: string[], botConfig: BotConfig): string[] {
 
 // 情况3
 function playAgainst(cardRecord: CardStackRecord, myCards: string[]): string[] {
-  const allHands = flattenHandPool(extractAllPlayableHands(myCards))
-    .filter((hand) => compareHands(hand, cardRecord[1]));
+  const allHands = flattenHandPool(extractAllPlayableHands(myCards)).filter(hand => compareHands(hand, cardRecord[1]));
   return _.sample(allHands) || [];
 }
 
