@@ -1,6 +1,6 @@
 import combinations from 'combinations';
 import _ from 'lodash';
-import { compareHands } from '.';
+import { compareHands } from './play';
 import { legalStraights, MIN_4 } from './utils/const';
 import { CardStack, CardStackRecord, HandPool, HANDTYPE } from './utils/types';
 import { canIplayAnything, canIplayFirst } from './utils/util';

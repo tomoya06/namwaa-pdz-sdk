@@ -1,6 +1,5 @@
-import { EventEmitter, Listener } from 'events';
 import _ from 'lodash';
-import { compareHands, digestHand, shuffleCards } from './index';
+import { compareHands, digestHand, shuffleCards } from './play';
 import { MIN_4 } from './utils/const';
 import { CardStack, HANDTYPE, PlayerCardsList, PlayerIdList } from './utils/types';
 import { canIplayAnything, canIplayFirst } from './utils/util';
@@ -37,6 +36,10 @@ export default class Game {
 
   public get curPlayerId() {
     return this._playerIds[this._curIdx];
+  }
+
+  public get playerCards() {
+    return this._playerCards;
   }
 
   private get curPlayerCards() {

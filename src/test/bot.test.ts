@@ -1,27 +1,29 @@
 import { expect } from 'chai';
 import { describe } from 'mocha';
 import { extractAllPlayableHands } from '../bot';
-import { cardEncoder, digestHand, displayHands, shuffleCards } from "../index"
+import { digestHand, shuffleCards } from '../play';
 import { HANDTYPE } from '../utils/types';
 
 function printHands(hands?: string[][]): string {
-  if (!hands || !hands.length) {return '-';}
+  if (!hands || !hands.length) {
+    return '-';
+  }
   return hands.map(hand => displayHands(hand)).join(' | ');
 }
 
 describe('+ Bot', () => {
   const shuffleRes = shuffleCards();
   const { hands: allPlayersHands, starter } = shuffleRes;
-  allPlayersHands.forEach((hands) => {
+  allPlayersHands.forEach(hands => {
     checkHands(hands);
-  })
-})
+  });
+});
 
 describe('+ custom', () => {
   const customHands = '♦4 ♥4 ♠4 ♠5 ♠6 ♣7 ♥7 ♠7 ♥8 ♦10 ♠Q ♦2 ♥3';
-  const realHands = customHands.split(' ').map(card => cardEncoder({point: card.slice(1), suit: card[0]}));
+  const realHands = customHands.split(' ').map(card => cardEncoder({ point: card.slice(1), suit: card[0] }));
   checkHands(realHands);
-})
+});
 
 function checkHands(hands: string[]) {
   describe(`- Player hands extraction: `, () => {
@@ -38,7 +40,7 @@ function checkHands(hands: string[]) {
       [HANDTYPE.House, 'House'],
       [HANDTYPE.Four, 'Four'],
       [HANDTYPE.FS, 'FS'],
-    ]
+    ];
 
     testArr.forEach(([type, msg]) => {
       const curRes = extractRes.get(type);
@@ -47,10 +49,17 @@ function checkHands(hands: string[]) {
         it(msg, () => {
           expect(curRes).to.satisfy((res: string[][]) => {
             return res.every(r => digestHand(r).type === type);
-          })
-        })
+          });
+        });
       }
-    })
-  })
+    });
+  });
+}
 
+function displayHands(hand: string[]): any {
+  throw new Error('Function not implemented.');
+}
+
+function cardEncoder(arg0: { point: string; suit: string }): any {
+  throw new Error('Function not implemented.');
 }

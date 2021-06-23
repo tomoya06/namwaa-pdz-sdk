@@ -2,7 +2,8 @@ import { expect } from 'chai';
 import 'mocha';
 import { MIN_4 } from '../utils/const';
 
-import { cardDecoder, cardEncoder, shuffleCards } from '../index';
+import { shuffleCards } from '../play';
+import { cardDecoder, cardEncoder } from '../transform';
 import { PokerCard } from '../utils/types';
 
 const poker: PokerCard = {

@@ -2,7 +2,7 @@ import { expect } from "chai";
 import "mocha";
 import { BIG_3, MIN_4 } from "../utils/const";
 
-import { compareHands, digestHand, } from "../index";
+import { compareHands, digestHand, } from "../play";
 import { HANDTYPE } from "../utils/types";
 
 describe("+ Check Hands", () => {

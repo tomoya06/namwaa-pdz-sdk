@@ -8,12 +8,11 @@
     "test": "mocha -r ts-node/register src/test/*.test.ts",
     "testone": "mocha -r ts-node/register src/test/bot.test.ts",
     "clean": "rm -rf dist",
-    "build": "npm run clean && tsc -p tsconfig.json && npm run minify",
+    "tsbuild": "npm run clean && tsc -p tsconfig.json && npm run minify",
+    "build": "npm run clean && rollup -c rollup.config.js",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "minify": "uglifyjs --compress --mangle --output dist/index.min.js -- dist/index.js",
-    "lint": "tslint -p tslint.json",
-    "prepare": "npm run build",
-    "postversion": "git push"
+    "lint": "tslint -p tslint.json"
   },
   "keywords": [
     "Poker",
@@ -24,6 +23,7 @@
   "author": "tomoya06",
   "license": "ISC",
   "devDependencies": {
+    "@rollup/plugin-typescript": "^8.2.1",
     "@types/chai": "^4.2.0",
     "@types/combinations": "^1.0.0",
     "@types/events": "^3.0.0",
@@ -32,15 +32,18 @@
     "chai-things": "^0.2.0",
     "mocha": "^6.2.0",
     "prettier": "^1.18.2",
+    "rollup": "^2.52.2",
+    "rollup-plugin-typescript2": "^0.30.0",
     "ts-node": "^8.3.0",
+    "tslib": "^2.3.0",
     "tslint": "^5.18.0",
     "tslint-config-airbnb": "^5.11.1",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.5.3",
+    "typescript": "^3.9.10",
     "uglify-js": "^3.6.0"
   },
   "dependencies": {
-    "@types/lodash": "^4.14.136",
+    "@types/lodash": "^4.14.170",
     "combinations": "^1.0.0",
     "events": "^3.3.0",
     "lodash": "^4.17.15"
