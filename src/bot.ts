@@ -1,9 +1,11 @@
 import combinations from 'combinations';
 import _ from 'lodash';
+import { compareHands } from '.';
 import { legalStraights, MIN_4 } from './utils/const';
 import { HANDTYPE } from './utils/types';
 
-export type CardStack = Array<[string, string[][]]>;
+export type CardStackRecord = [string, string[]];
+export type CardStack = CardStackRecord[];
 export type HandPool = Map<HANDTYPE, string[][]>;
 
 export interface BotConfig {
@@ -37,6 +39,10 @@ function suitMapper(myCards: string[]) {
 function isStraight(hands: string[]): boolean {
   hands.sort();
   return hands.every((card, idx) => card.charCodeAt(0) - idx === hands[0].charCodeAt(0) - 0);
+}
+
+function flattenHandPool(pool: HandPool): string[][] {
+  return _.flatten([...pool.values()]);
 }
 
 export function extractAllPlayableHands(myCards: string[]): HandPool {
@@ -126,14 +132,17 @@ export function extractAllPlayableHands(myCards: string[]): HandPool {
   return res;
 }
 
+// 情况1
 function canIplayFirst(stacks: CardStack, myCards: string[]): boolean {
   if (stacks.length !== 0) { return false; }
   return _.includes(myCards, MIN_4);
 }
 
 function playFirst(myCards: string[], botConfig: BotConfig): string[] {
-  // TODO: 先发
-  return [];
+  const allHands = flattenHandPool(extractAllPlayableHands(myCards))
+    .filter(hand => hand.includes(MIN_4));
+
+  return _.sample(allHands) as string[];
 }
 
 // 情况2
@@ -155,16 +164,36 @@ function canIplayAnything(stacks: CardStack, myId: string): [boolean, number] {
   return [true, -1];
 }
 
+function playAnything(myCards: string[], botConfig: BotConfig): string[] {
+  const allHands = flattenHandPool(extractAllPlayableHands(myCards));
+  return _.sample(allHands) as string[];
+}
+
+// 情况3
+function playAgainst(cardRecord: CardStackRecord, myCards: string[]): string[] {
+  const allHands = flattenHandPool(extractAllPlayableHands(myCards))
+    .filter((hand) => compareHands(hand, cardRecord[1]));
+  return _.sample(allHands) || [];
+}
+
 /**
  * 机器自动出一手牌
  */
 export function botPlay(stacks: CardStack, myCards: string[], myId: string, botConfig: BotConfig): string[] {
+  // 0. 我打完了
+  if (!myCards.length) {
+    return [];
+  }
   // 1. 我先出
   if (canIplayFirst(stacks, myCards)) {
     return playFirst(myCards, botConfig);
   }
   // 2. 其他人都不要
+  const playAnythingRes = canIplayAnything(stacks, myId);
+  if (playAnythingRes[0]) {
+    return playAnything(myCards, botConfig);
+  }
   // 3. 打上家
-  // 4. 打不过
-  return [];
+  const hisCard = stacks[playAnythingRes[1]];
+  return playAgainst(hisCard, myCards);
 }
