@@ -2,7 +2,6 @@ import { expect } from 'chai';
 import { describe } from 'mocha';
 import { extractAllPlayableHands } from '../bot';
 import { cardEncoder, digestHand, displayHands, shuffleCards } from "../index"
-import { suitColorMapper } from '../utils/const';
 import { HANDTYPE } from '../utils/types';
 
 function printHands(hands?: string[][]): string {
@@ -10,13 +9,13 @@ function printHands(hands?: string[][]): string {
   return hands.map(hand => displayHands(hand)).join(' | ');
 }
 
-// describe('+ Bot', () => {
-//   const shuffleRes = shuffleCards();
-//   const { hands: allPlayersHands, starter } = shuffleRes;
-//   allPlayersHands.forEach((hands) => {
-//     checkHands(hands);
-//   })
-// })
+describe('+ Bot', () => {
+  const shuffleRes = shuffleCards();
+  const { hands: allPlayersHands, starter } = shuffleRes;
+  allPlayersHands.forEach((hands) => {
+    checkHands(hands);
+  })
+})
 
 describe('+ custom', () => {
   const customHands = '♦4 ♥4 ♠4 ♠5 ♠6 ♣7 ♥7 ♠7 ♥8 ♦10 ♠Q ♦2 ♥3';

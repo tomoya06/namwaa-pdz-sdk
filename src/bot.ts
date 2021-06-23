@@ -63,9 +63,9 @@ export function extractAllPlayableHands(myCards: string[]): HandPool {
   }
 
   // 同花 & 同花顺
+  const fsRes: string[][] = [];
+  const flushRes: string[][] = [];
   Object.values(suitMap).forEach(cards => {
-    const fsRes: string[][] = [];
-    const flushRes: string[][] = [];
     if (cards.length >= 5) {
       const combRes = combinations(cards, 5, 5);
       combRes.forEach(hands => {
@@ -76,52 +76,52 @@ export function extractAllPlayableHands(myCards: string[]): HandPool {
         }
       })
     }
-    res.set(HANDTYPE.Flush, flushRes);
-    res.set(HANDTYPE.FS, fsRes);
   })
+  res.set(HANDTYPE.Flush, flushRes);
+  res.set(HANDTYPE.FS, fsRes);
 
   // 顺子(不包含同花顺)
   // 同一串数字的顺子 只取消耗最小的一副
+  const straightRes: string[][] = [];
   legalStraights.forEach(ls => {
-    const curRes: string[][] = [];
     const lsEnough = ls.every(lsKey => cardMap[lsKey]);
     if (lsEnough) {
       const cards = ls.map(lsKey => cardMap[lsKey][0]);
       if (!cards.every(card => card[1] === cards[0][1])) {
-        curRes.push(cards);
+        straightRes.push(cards);
       }
     }
-    res.set(HANDTYPE.Straight, curRes);
   })
+  res.set(HANDTYPE.Straight, straightRes);
 
   // 富庶
   // 只取消耗最小的一副
+  const houseRes: string[][] = [];
   if (h3s.length && h2s.length) {
-    const curRes: string[][] = [];
     h3s.forEach(cards => {
       const res3 = cards.slice(0,3);
 
       h2s.forEach(cards2 => {
         if (cards2[0][0] === cards[0][0]) { return; }
         const res2 = cards2.slice(0,2);
-        curRes.push([...res2, ...res3].sort());
+        houseRes.push([...res2, ...res3].sort());
       })
     })
-    res.set(HANDTYPE.House, curRes);
   }
+  res.set(HANDTYPE.House, houseRes);
 
   // 福禄
   // 只取消耗最小的一副
+  const fourRes: string[][] = [];
   if (h4s.length) {
-    const curRes: string[][] = [];
     h4s.forEach(cards => {
       h1s.forEach(cards1 => {
         if (cards1[0][0] === cards[0][0]) { return; }
-        curRes.push([cards1[0], ...cards]);
+        fourRes.push([cards1[0], ...cards]);
       })
     })
-    res.set(HANDTYPE.Four, curRes);
   }
+  res.set(HANDTYPE.Four, fourRes);
 
   return res;
 }
