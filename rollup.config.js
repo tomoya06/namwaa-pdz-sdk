@@ -2,14 +2,16 @@
 import typescript from 'rollup-plugin-typescript2';
 
 function buildConfig(filename) {
-  return   {
+  return {
     input: `src/${filename}.ts`,
     output: {
       file: `dist/${filename}.js`,
       format: 'es'
     },
-    external: [ 'lodash', 'combinations' ],
-    plugins: [typescript()],
+    external: ['lodash', 'combinations'],
+    plugins: [typescript({
+      tsconfigOverride: { compilerOptions: { module: "es2015" } }
+    })],
   }
 }
 

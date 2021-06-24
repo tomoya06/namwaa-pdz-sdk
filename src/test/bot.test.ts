@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import { describe } from 'mocha';
 import { extractAllPlayableHands } from '../bot';
 import { digestHand, shuffleCards } from '../play';
+import { cardEncoder, displayHands } from '../transform';
 import { HANDTYPE } from '../utils/types';
 
 function printHands(hands?: string[][]): string {
@@ -54,12 +55,4 @@ function checkHands(hands: string[]) {
       }
     });
   });
-}
-
-function displayHands(hand: string[]): any {
-  throw new Error('Function not implemented.');
-}
-
-function cardEncoder(arg0: { point: string; suit: string }): any {
-  throw new Error('Function not implemented.');
 }
