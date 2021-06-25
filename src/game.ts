@@ -99,8 +99,8 @@ export default class Game {
   }
 
   private consumeHands(userId: string, hands: string[]): string[] {
-    this._stacks.push([userId, hands]);
     this._playerCards[userId] = _.difference(this._playerCards[userId], hands);
+    this._stacks.push([userId, hands, this._playerCards[userId].length]);
     return this.curPlayerCards;
   }
 
@@ -113,6 +113,8 @@ export default class Game {
       if (this.curPlayerCards.length > 0) {
         break;
       }
+      // 当前人已经无牌，加一条记录继续轮换
+      this.consumeHands(this.curPlayerId, []);
     }
   }
 }

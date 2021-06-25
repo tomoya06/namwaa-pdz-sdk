@@ -29,7 +29,9 @@ export interface PokerCard {
   point: string;
 }
 
-export type CardStackRecord = [string, string[]];
+// 出牌记录，[玩家id，出牌，剩余牌数]
+export type CardStackRecord = [string, string[], number];
+// 出牌记录堆栈
 export type CardStack = CardStackRecord[];
 export type HandPool = Map<HANDTYPE, string[][]>;
 export type PlayerIdList = [string, string, string, string];
