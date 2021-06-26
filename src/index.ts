@@ -1,7 +1,11 @@
-import * as play from './play';
-import * as transform from './transform';
+import { compareHands, digestHand, shuffleCards } from './play';
+import { cardDecoder, cardDecoderForDisplay, displayHands } from './transform';
 
 export default {
-  ...play,
-  ...transform,
+  compareHands,
+  digestHand,
+  shuffleCards,
+  cardDecoder,
+  cardDecoderForDisplay,
+  displayHands,
 }

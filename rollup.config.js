@@ -1,5 +1,6 @@
 // rollup.config.js
 import typescript from 'rollup-plugin-typescript2';
+import commonjs from '@rollup/plugin-commonjs';
 
 function buildConfig(filename) {
   return {
@@ -9,9 +10,12 @@ function buildConfig(filename) {
       format: 'es'
     },
     external: ['lodash', 'combinations'],
-    plugins: [typescript({
-      tsconfigOverride: { compilerOptions: { module: "es2015" } }
-    })],
+    plugins: [
+      commonjs(),
+      typescript({
+        tsconfigOverride: { compilerOptions: { module: "es2015" } }
+      })
+    ],
   }
 }
 
